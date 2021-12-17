@@ -129,7 +129,7 @@ class IssueExtractor {
 exports.IssueExtractor = IssueExtractor;
 const extractName = (issue) => {
     if (issue.title.split(':').length > 1) {
-        return issue.title.split(':')[1];
+        return issue.title.split(':')[1].trim();
     }
     return issue.title;
 };

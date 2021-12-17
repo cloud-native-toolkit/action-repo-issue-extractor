@@ -65,7 +65,7 @@ export class IssueExtractor {
 
 const extractName = (issue: GithubIssue): string => {
   if (issue.title.split(':').length > 1) {
-    return issue.title.split(':')[1]
+    return issue.title.split(':')[1].trim()
   }
 
   return issue.title
