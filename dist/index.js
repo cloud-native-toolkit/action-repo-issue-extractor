@@ -96,21 +96,21 @@ exports.IssueExtractor = void 0;
 class IssueExtractor {
     extractInfo({ octokit, issue_number, owner, repo }) {
         return __awaiter(this, void 0, void 0, function* () {
-            const issue = (yield octokit.request('GET /repos/{owner}/{repo}/issues/{issue_number}', {
+            const issue = yield octokit
+                .request('GET /repos/{owner}/{repo}/issues/{issue_number}', {
                 owner,
                 repo,
                 issue_number
-            }
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            ));
+            })
+                .then(response => response.data);
             const name = extractName(issue);
-            const labels = (yield octokit.request('GET /repos/{owner}/{repo}/issues/{issue_number}/labels', {
+            const labels = yield octokit
+                .request('GET /repos/{owner}/{repo}/issues/{issue_number}/labels', {
                 owner,
                 repo,
                 issue_number
-            }
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            ));
+            })
+                .then(response => response.data);
             const type = extractType(labels);
             const provider = extractProvider(labels);
             const category = extractCategory(labels);

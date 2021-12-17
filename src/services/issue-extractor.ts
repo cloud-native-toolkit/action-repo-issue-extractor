@@ -29,27 +29,23 @@ export class IssueExtractor {
     owner,
     repo
   }: ExtractInfoParams): Promise<IssueInfo> {
-    const issue: GithubIssue = (await octokit.request(
-      'GET /repos/{owner}/{repo}/issues/{issue_number}',
-      {
+    const issue: GithubIssue = await octokit
+      .request('GET /repos/{owner}/{repo}/issues/{issue_number}', {
         owner,
         repo,
         issue_number
-      }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    )) as any
+      })
+      .then(response => response.data)
 
     const name = extractName(issue)
 
-    const labels: GithubLabel[] = (await octokit.request(
-      'GET /repos/{owner}/{repo}/issues/{issue_number}/labels',
-      {
+    const labels: GithubLabel[] = await octokit
+      .request('GET /repos/{owner}/{repo}/issues/{issue_number}/labels', {
         owner,
         repo,
         issue_number
-      }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    )) as any
+      })
+      .then(response => response.data)
 
     const type = extractType(labels)
     const provider = extractProvider(labels)
