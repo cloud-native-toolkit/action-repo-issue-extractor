@@ -127,7 +127,12 @@ class IssueExtractor {
     }
 }
 exports.IssueExtractor = IssueExtractor;
-const extractName = (issue) => issue.title;
+const extractName = (issue) => {
+    if (issue.title.split(':').length > 1) {
+        return issue.title.split(':')[1];
+    }
+    return issue.title;
+};
 const extractType = (labels) => {
     return extractValueFromLabel(labels, 'type');
 };

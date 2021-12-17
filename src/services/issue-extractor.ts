@@ -63,7 +63,13 @@ export class IssueExtractor {
   }
 }
 
-const extractName = (issue: GithubIssue): string => issue.title
+const extractName = (issue: GithubIssue): string => {
+  if (issue.title.split(':').length > 1) {
+    return issue.title.split(':')[1]
+  }
+
+  return issue.title
+}
 
 const extractType = (labels: GithubLabel[]): string | undefined => {
   return extractValueFromLabel(labels, 'type')
