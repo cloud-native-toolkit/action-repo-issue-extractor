@@ -27,6 +27,8 @@ outputs:
     description: Flag indicating the issue has been approved
   requester:
     description: The id of the user who opened the issue
+  state:
+    description: The state of the issue
 runs:
   using: 'node12'
   main: 'dist/index.js'

@@ -14,11 +14,13 @@ export interface IssueInfo {
   category?: string
   approved: boolean
   requester: string
+  state: string
 }
 
 interface GithubIssue {
   title: string
   user: {login: string}
+  state: string
 }
 interface GithubLabel {
   name: string
@@ -42,6 +44,7 @@ export class IssueExtractor {
 
     const name = extractName(issue)
     const requester = extractRequester(issue)
+    const state = extractState(issue)
 
     const labels: GithubLabel[] = await octokit
       .request('GET /repos/{owner}/{repo}/issues/{issue_number}/labels', {
@@ -63,7 +66,8 @@ export class IssueExtractor {
       provider,
       category,
       approved,
-      requester
+      requester,
+      state
     }
   }
 }
@@ -78,6 +82,10 @@ const extractName = (issue: GithubIssue): string => {
 
 const extractRequester = (issue: GithubIssue): string => {
   return issue.user.login
+}
+
+const extractState = (issue: GithubIssue): string => {
+  return issue.state
 }
 
 const extractType = (labels: GithubLabel[]): string | undefined => {

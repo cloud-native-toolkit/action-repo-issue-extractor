@@ -107,6 +107,7 @@ class IssueExtractor {
                 .then(response => response.data));
             const name = extractName(issue);
             const requester = extractRequester(issue);
+            const state = extractState(issue);
             const labels = yield octokit
                 .request('GET /repos/{owner}/{repo}/issues/{issue_number}/labels', {
                 owner,
@@ -124,7 +125,8 @@ class IssueExtractor {
                 provider,
                 category,
                 approved,
-                requester
+                requester,
+                state
             };
         });
     }
@@ -138,6 +140,9 @@ const extractName = (issue) => {
 };
 const extractRequester = (issue) => {
     return issue.user.login;
+};
+const extractState = (issue) => {
+    return issue.state;
 };
 const extractType = (labels) => {
     return extractValueFromLabel(labels, 'type');
