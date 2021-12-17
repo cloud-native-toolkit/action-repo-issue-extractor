@@ -13,10 +13,12 @@ export interface IssueInfo {
   provider?: string
   category?: string
   approved: boolean
+  requester: string
 }
 
 interface GithubIssue {
   title: string
+  user: {login: string}
 }
 interface GithubLabel {
   name: string
@@ -29,15 +31,17 @@ export class IssueExtractor {
     owner,
     repo
   }: ExtractInfoParams): Promise<IssueInfo> {
-    const issue: GithubIssue = await octokit
+    const issue: GithubIssue = (await octokit
       .request('GET /repos/{owner}/{repo}/issues/{issue_number}', {
         owner,
         repo,
         issue_number
       })
-      .then(response => response.data)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .then(response => response.data)) as any
 
     const name = extractName(issue)
+    const requester = extractRequester(issue)
 
     const labels: GithubLabel[] = await octokit
       .request('GET /repos/{owner}/{repo}/issues/{issue_number}/labels', {
@@ -58,7 +62,8 @@ export class IssueExtractor {
       type,
       provider,
       category,
-      approved
+      approved,
+      requester
     }
   }
 }
@@ -68,7 +73,11 @@ const extractName = (issue: GithubIssue): string => {
     return issue.title.split(':')[1].trim()
   }
 
-  return issue.title
+  return issue.title.trim()
+}
+
+const extractRequester = (issue: GithubIssue): string => {
+  return issue.user.login
 }
 
 const extractType = (labels: GithubLabel[]): string | undefined => {
