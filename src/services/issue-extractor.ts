@@ -15,6 +15,7 @@ export interface IssueInfo {
   approved: boolean
   requester: string
   state: string
+  issue_number: number
 }
 
 interface GithubIssue {
@@ -67,7 +68,8 @@ export class IssueExtractor {
       category,
       approved,
       requester,
-      state
+      state,
+      issue_number
     }
   }
 }
