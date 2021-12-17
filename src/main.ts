@@ -7,10 +7,15 @@ async function run(): Promise<void> {
   try {
     const token: string = core.getInput('token')
     const issue_number: number = parseInt(core.getInput('issue_number'))
+    const inputOwner: string = core.getInput('owner')
+    const inputRepo: string = core.getInput('repo')
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const octokit: Octokit = github.getOctokit(token) as any
-    const {owner, repo} = github.context.repo
+    const current: {owner: string; repo: string} = github.context.repo
+
+    const owner = inputOwner || current.owner
+    const repo = inputRepo || current.repo
 
     core.info(`Extracting info from ${owner}/${repo}#${issue_number}`)
 

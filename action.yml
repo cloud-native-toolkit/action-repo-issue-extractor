@@ -8,6 +8,12 @@ inputs:
   issue_number:
     required: true
     description: 'The id of the issue from which information should be extracted'
+  repo:
+    required: false
+    description: The name of the repo where the issue can be found. If not provided defaults to current repo
+  owner:
+    required: false
+    description: The name of the org where the repo is located. If not provided defaults to current org
 outputs:
   type:
     description: The type of the repository (gitops or terraform)

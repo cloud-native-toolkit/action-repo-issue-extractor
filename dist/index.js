@@ -43,9 +43,13 @@ function run() {
         try {
             const token = core.getInput('token');
             const issue_number = parseInt(core.getInput('issue_number'));
+            const inputOwner = core.getInput('owner');
+            const inputRepo = core.getInput('repo');
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const octokit = github.getOctokit(token);
-            const { owner, repo } = github.context.repo;
+            const current = github.context.repo;
+            const owner = inputOwner || current.owner;
+            const repo = inputRepo || current.repo;
             core.info(`Extracting info from ${owner}/${repo}#${issue_number}`);
             const service = new issue_extractor_1.IssueExtractor();
             const result = yield service.extractInfo({

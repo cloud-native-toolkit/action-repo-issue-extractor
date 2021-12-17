@@ -23,4 +23,5 @@ jobs:
         with:
           token: ${{ secrets.GIT_ADMIN_TOKEN }}
           issue_number: 138
+          repo: automation-modules
 
