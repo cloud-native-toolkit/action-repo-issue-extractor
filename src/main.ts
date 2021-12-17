@@ -1,19 +1,38 @@
 import * as core from '@actions/core'
-import {wait} from './wait'
+import * as github from '@actions/github'
+import {Octokit} from '@octokit/action'
+import {IssueExtractor, IssueInfo} from './services/issue-extractor'
 
 async function run(): Promise<void> {
   try {
-    const ms: string = core.getInput('milliseconds')
-    core.debug(`Waiting ${ms} milliseconds ...`) // debug is only output if you set the secret `ACTIONS_STEP_DEBUG` to true
+    const token: string = core.getInput('token')
+    const issue_number: number = parseInt(core.getInput('issue_number'))
 
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const octokit: Octokit = github.getOctokit(token) as any
+    const {owner, repo} = github.context.repo
 
-    core.setOutput('time', new Date().toTimeString())
+    const service: IssueExtractor = new IssueExtractor()
+
+    const result: IssueInfo = await service.extractInfo({
+      octokit,
+      issue_number,
+      owner,
+      repo
+    })
+
+    core.info(`Extracted values: ${JSON.stringify(result)}`)
+
+    // eslint-disable-next-line github/array-foreach
+    Object.keys(result).forEach((value: string) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const key: keyof IssueInfo = value as any
+
+      core.setOutput(key, result[key] || '')
+    })
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
   }
 }
 
-run()
+run().catch(error => core.error(`Error running script: ${error.message}`))

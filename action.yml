@@ -1,11 +1,24 @@
-name: 'Your name here'
+name: 'Repo Issue Extractor'
 description: 'Provide a description here'
-author: 'Your name or organization here'
+author: 'Sean Sundberg'
 inputs:
-  milliseconds: # change this
+  token:
     required: true
-    description: 'input description here'
-    default: 'default value if applicable'
+    description: GitHub token with the access necessary to provision a new repository in the target org
+  issue_number:
+    required: true
+    description: 'The id of the issue from which information should be extracted'
+outputs:
+  type:
+    description: The type of the repository (gitops or terraform)
+  name:
+    description: The name of the repository
+  provider:
+    description: The cloud provider
+  catagory:
+    description: The category of the module
+  approved:
+    description: Flag indicating the issue has been approved
 runs:
   using: 'node12'
   main: 'dist/index.js'
