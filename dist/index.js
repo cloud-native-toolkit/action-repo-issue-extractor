@@ -42,7 +42,7 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const token = core.getInput('token');
-            const issue_number = parseInt(core.getInput('issue_number'));
+            const inputIssueNumber = parseInt(core.getInput('issue_number'));
             const inputOwner = core.getInput('owner');
             const inputRepo = core.getInput('repo');
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -50,6 +50,7 @@ function run() {
             const current = github.context.repo;
             const owner = inputOwner || current.owner;
             const repo = inputRepo || current.repo;
+            const issue_number = inputIssueNumber || github.context.issue.number;
             core.info(`Extracting info from ${owner}/${repo}#${issue_number}`);
             const service = new issue_extractor_1.IssueExtractor();
             const result = yield service.extractInfo({

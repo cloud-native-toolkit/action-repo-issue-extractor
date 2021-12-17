@@ -6,8 +6,8 @@ inputs:
     required: true
     description: GitHub token with the access necessary to provision a new repository in the target org
   issue_number:
-    required: true
-    description: 'The id of the issue from which information should be extracted'
+    required: false
+    description: The id of the issue from which information should be extracted. If not provided will use the one that generated the event
   repo:
     required: false
     description: The name of the repo where the issue can be found. If not provided defaults to current repo

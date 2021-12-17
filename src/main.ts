@@ -6,7 +6,7 @@ import {IssueExtractor, IssueInfo} from './services/issue-extractor'
 async function run(): Promise<void> {
   try {
     const token: string = core.getInput('token')
-    const issue_number: number = parseInt(core.getInput('issue_number'))
+    const inputIssueNumber: number = parseInt(core.getInput('issue_number'))
     const inputOwner: string = core.getInput('owner')
     const inputRepo: string = core.getInput('repo')
 
@@ -14,8 +14,9 @@ async function run(): Promise<void> {
     const octokit: Octokit = github.getOctokit(token) as any
     const current: {owner: string; repo: string} = github.context.repo
 
-    const owner = inputOwner || current.owner
-    const repo = inputRepo || current.repo
+    const owner: string = inputOwner || current.owner
+    const repo: string = inputRepo || current.repo
+    const issue_number: number = inputIssueNumber || github.context.issue.number
 
     core.info(`Extracting info from ${owner}/${repo}#${issue_number}`)
 
