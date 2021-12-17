@@ -12,6 +12,8 @@ async function run(): Promise<void> {
     const octokit: Octokit = github.getOctokit(token) as any
     const {owner, repo} = github.context.repo
 
+    core.info(`Extracting info from ${owner}/${repo}#${issue_number}`)
+
     const service: IssueExtractor = new IssueExtractor()
 
     const result: IssueInfo = await service.extractInfo({

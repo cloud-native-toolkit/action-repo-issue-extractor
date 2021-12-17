@@ -46,6 +46,7 @@ function run() {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const octokit = github.getOctokit(token);
             const { owner, repo } = github.context.repo;
+            core.info(`Extracting info from ${owner}/${repo}#${issue_number}`);
             const service = new issue_extractor_1.IssueExtractor();
             const result = yield service.extractInfo({
                 octokit,
