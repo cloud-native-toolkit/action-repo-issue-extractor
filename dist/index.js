@@ -126,7 +126,8 @@ class IssueExtractor {
                 category,
                 approved,
                 requester,
-                state
+                state,
+                issue_number
             };
         });
     }
