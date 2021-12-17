@@ -1,19 +1,46 @@
 import * as core from '@actions/core'
-import {wait} from './wait'
+import * as github from '@actions/github'
+import {Octokit} from '@octokit/action'
+import {IssueExtractor, IssueInfo} from './services/issue-extractor'
 
 async function run(): Promise<void> {
   try {
-    const ms: string = core.getInput('milliseconds')
-    core.debug(`Waiting ${ms} milliseconds ...`) // debug is only output if you set the secret `ACTIONS_STEP_DEBUG` to true
+    const token: string = core.getInput('token')
+    const inputIssueNumber: number = parseInt(core.getInput('issue_number'))
+    const inputOwner: string = core.getInput('owner')
+    const inputRepo: string = core.getInput('repo')
 
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const octokit: Octokit = github.getOctokit(token) as any
+    const current: {owner: string; repo: string} = github.context.repo
 
-    core.setOutput('time', new Date().toTimeString())
+    const owner: string = inputOwner || current.owner
+    const repo: string = inputRepo || current.repo
+    const issue_number: number = inputIssueNumber || github.context.issue.number
+
+    core.info(`Extracting info from ${owner}/${repo}#${issue_number}`)
+
+    const service: IssueExtractor = new IssueExtractor()
+
+    const result: IssueInfo = await service.extractInfo({
+      octokit,
+      issue_number,
+      owner,
+      repo
+    })
+
+    core.info(`Extracted values: ${JSON.stringify(result)}`)
+
+    // eslint-disable-next-line github/array-foreach
+    Object.keys(result).forEach((value: string) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const key: keyof IssueInfo = value as any
+
+      core.setOutput(key, result[key] || '')
+    })
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
   }
 }
 
-run()
+run().catch(error => core.error(`Error running script: ${error.message}`))

@@ -1,11 +1,34 @@
-name: 'Your name here'
+name: 'Repo Issue Extractor'
 description: 'Provide a description here'
-author: 'Your name or organization here'
+author: 'Sean Sundberg'
 inputs:
-  milliseconds: # change this
+  token:
     required: true
-    description: 'input description here'
-    default: 'default value if applicable'
+    description: GitHub token with the access necessary to provision a new repository in the target org
+  issue_number:
+    required: false
+    description: The id of the issue from which information should be extracted. If not provided will use the one that generated the event
+  repo:
+    required: false
+    description: The name of the repo where the issue can be found. If not provided defaults to current repo
+  owner:
+    required: false
+    description: The name of the org where the repo is located. If not provided defaults to current org
+outputs:
+  type:
+    description: The type of the repository (gitops or terraform)
+  name:
+    description: The name of the repository
+  provider:
+    description: The cloud provider
+  catagory:
+    description: The category of the module
+  approved:
+    description: Flag indicating the issue has been approved
+  requester:
+    description: The id of the user who opened the issue
+  state:
+    description: The state of the issue
 runs:
   using: 'node12'
   main: 'dist/index.js'
