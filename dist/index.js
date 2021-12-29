@@ -305,12 +305,8 @@ const extractValuesFromComments = (comments) => {
     const logger = typescript_ioc_1.Container.get(logger_1.LoggerApi);
     const valueRegEx = new RegExp('^/([^ ]+) (.*)', 'ig');
     const commentLines = comments.reduce((result, current) => {
-        if (current.body) {
-            result.push(...current.body.split(/\r?\n/).filter(l => {
-                const match = valueRegEx.test(l);
-                logger.info(`Comment body line: ${l}, ${match}`);
-                return match;
-            }));
+        if (current.body && valueRegEx.test(current.body)) {
+            result.push(current.body);
         }
         return result;
     }, []);

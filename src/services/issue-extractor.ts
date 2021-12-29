@@ -146,15 +146,8 @@ const extractValuesFromComments = <T = any>(comments: GithubComment[]): T => {
 
   const commentLines: string[] = comments.reduce(
     (result: string[], current: GithubComment) => {
-      if (current.body) {
-        result.push(
-          ...current.body.split(/\r?\n/).filter(l => {
-            const match = valueRegEx.test(l)
-            logger.info(`Comment body line: ${l}, ${match}`)
-
-            return match
-          })
-        )
+      if (current.body && valueRegEx.test(current.body)) {
+        result.push(current.body)
       }
 
       return result
