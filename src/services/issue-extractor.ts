@@ -1,4 +1,6 @@
 import {Octokit} from '@octokit/action'
+import {LoggerApi} from '../logger'
+import {Container} from 'typescript-ioc'
 
 export interface ExtractInfoParams {
   octokit: Octokit
@@ -31,12 +33,19 @@ interface GithubComment {
 }
 
 export class IssueExtractor {
+  logger: LoggerApi
+
+  constructor() {
+    this.logger = Container.get(LoggerApi)
+  }
+
   async extractInfo({
     octokit,
     issue_number,
     owner,
     repo
   }: ExtractInfoParams): Promise<IssueInfo> {
+    this.logger.info(`Retrieving details for issue: ${issue_number}`)
     const issue: GithubIssue = (await octokit
       .request('GET /repos/{owner}/{repo}/issues/{issue_number}', {
         owner,
@@ -50,6 +59,7 @@ export class IssueExtractor {
     const requester = extractRequester(issue)
     const state = extractState(issue)
 
+    this.logger.info(`Retrieving labels for issue: ${issue_number}`)
     const labels: GithubLabel[] = await octokit
       .request('GET /repos/{owner}/{repo}/issues/{issue_number}/labels', {
         owner,
@@ -57,9 +67,12 @@ export class IssueExtractor {
         issue_number
       })
       .then(response => response.data)
+    this.logger.info(`  Labels: ${JSON.stringify(labels)}`)
 
     const labelValues = extractValuesFromLabel(labels)
+    this.logger.info(`Extracted label values: ${JSON.stringify(labelValues)}`)
 
+    this.logger.info(`Retrieving comments for issue: ${issue_number}`)
     const comments: GithubComment[] = await octokit
       .request('GET /repos/{owner}/{repo}/issues/{issue_number}/comments', {
         owner,
@@ -67,8 +80,12 @@ export class IssueExtractor {
         issue_number
       })
       .then(response => response.data)
+    this.logger.info(`  Comments: ${JSON.stringify(comments)}`)
 
     const commentValues = extractValuesFromComments(comments)
+    this.logger.info(
+      `Extracted comment values: ${JSON.stringify(commentValues)}`
+    )
 
     return Object.assign(
       {

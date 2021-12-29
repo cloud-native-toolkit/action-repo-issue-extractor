@@ -2,8 +2,14 @@ import * as core from '@actions/core'
 import * as github from '@actions/github'
 import {Octokit} from '@octokit/action'
 import {IssueExtractor, IssueInfo} from './services/issue-extractor'
+import {Container} from 'typescript-ioc'
+import {LoggerApi} from './logger'
+import {ActionLogger} from './logger/logger.action'
 
 async function run(): Promise<void> {
+  Container.bind(LoggerApi).to(ActionLogger)
+
+  const logger: LoggerApi = Container.get(LoggerApi)
   try {
     const token: string = core.getInput('token')
     const inputIssueNumber: number = parseInt(core.getInput('issue_number'))
@@ -18,7 +24,7 @@ async function run(): Promise<void> {
     const repo: string = inputRepo || current.repo
     const issue_number: number = inputIssueNumber || github.context.issue.number
 
-    core.info(`Extracting info from ${owner}/${repo}#${issue_number}`)
+    logger.info(`Extracting info from ${owner}/${repo}#${issue_number}`)
 
     const service: IssueExtractor = new IssueExtractor()
 
@@ -29,7 +35,7 @@ async function run(): Promise<void> {
       repo
     })
 
-    core.info(`Extracted values: ${JSON.stringify(result)}`)
+    logger.info(`Extracted values: ${JSON.stringify(result)}`)
 
     // eslint-disable-next-line github/array-foreach
     Object.keys(result).forEach((value: string) => {
