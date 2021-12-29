@@ -306,8 +306,11 @@ const extractValuesFromComments = (comments) => {
     const valueRegEx = new RegExp('^/([^ ]+) (.*)', 'ig');
     const commentLines = comments.reduce((result, current) => {
         if (current.body) {
-            logger.info(`Comment body: ${current.body}`);
-            result.push(...current.body.split(/\r?\n/).filter(l => valueRegEx.test(l)));
+            result.push(...current.body.split(/\r?\n/).filter(l => {
+                const match = valueRegEx.test(l);
+                logger.info(`Comment body line: ${l}, ${match}`);
+                return match;
+            }));
         }
         return result;
     }, []);
