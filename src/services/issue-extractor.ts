@@ -67,7 +67,7 @@ export class IssueExtractor {
         issue_number
       })
       .then(response => response.data)
-    this.logger.info(`  Labels: ${JSON.stringify(labels)}`)
+    this.logger.debug(`  Labels: ${JSON.stringify(labels)}`)
 
     const labelValues = extractValuesFromLabel(labels)
     this.logger.info(`Extracted label values: ${JSON.stringify(labelValues)}`)
@@ -80,7 +80,7 @@ export class IssueExtractor {
         issue_number
       })
       .then(response => response.data)
-    this.logger.info(`  Comments: ${JSON.stringify(comments)}`)
+    this.logger.debug(`  Comments: ${JSON.stringify(comments)}`)
 
     const commentValues = extractValuesFromComments(comments)
     this.logger.info(
@@ -155,6 +155,8 @@ const extractValuesFromComments = <T = any>(comments: GithubComment[]): T => {
     },
     []
   )
+  const logger: LoggerApi = Container.get(LoggerApi)
+  logger.info(`Extracted comment lines: ${JSON.stringify(commentLines)}`)
 
   return commentLines.reduce(
     (result: T, current: string) => {

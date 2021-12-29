@@ -244,7 +244,7 @@ class IssueExtractor {
                 issue_number
             })
                 .then(response => response.data);
-            this.logger.info(`  Labels: ${JSON.stringify(labels)}`);
+            this.logger.debug(`  Labels: ${JSON.stringify(labels)}`);
             const labelValues = extractValuesFromLabel(labels);
             this.logger.info(`Extracted label values: ${JSON.stringify(labelValues)}`);
             this.logger.info(`Retrieving comments for issue: ${issue_number}`);
@@ -255,7 +255,7 @@ class IssueExtractor {
                 issue_number
             })
                 .then(response => response.data);
-            this.logger.info(`  Comments: ${JSON.stringify(comments)}`);
+            this.logger.debug(`  Comments: ${JSON.stringify(comments)}`);
             const commentValues = extractValuesFromComments(comments);
             this.logger.info(`Extracted comment values: ${JSON.stringify(commentValues)}`);
             return Object.assign({
@@ -309,6 +309,8 @@ const extractValuesFromComments = (comments) => {
         }
         return result;
     }, []);
+    const logger = typescript_ioc_1.Container.get(logger_1.LoggerApi);
+    logger.info(`Extracted comment lines: ${JSON.stringify(commentLines)}`);
     return commentLines.reduce((result, current) => {
         const match = current.match(valueRegEx);
         if (match) {
