@@ -141,11 +141,13 @@ const extractValuesFromLabel = <T = any>(labels: GithubLabel[]): T => {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const extractValuesFromComments = <T = any>(comments: GithubComment[]): T => {
+  const logger: LoggerApi = Container.get(LoggerApi)
   const valueRegEx = new RegExp('^/([^ ]+) (.*)', 'ig')
 
   const commentLines: string[] = comments.reduce(
     (result: string[], current: GithubComment) => {
       if (current.body) {
+        logger.info(`Comment body: ${current.body}`)
         result.push(
           ...current.body.split(/\r?\n/).filter(l => valueRegEx.test(l))
         )
@@ -155,13 +157,13 @@ const extractValuesFromComments = <T = any>(comments: GithubComment[]): T => {
     },
     []
   )
-  const logger: LoggerApi = Container.get(LoggerApi)
   logger.info(`Extracted comment lines: ${JSON.stringify(commentLines)}`)
 
   return commentLines.reduce(
     (result: T, current: string) => {
       const match: string[] | null = current.match(valueRegEx)
 
+      logger.info(`Match: ${JSON.stringify(match)}`)
       if (match) {
         const key = match[1]
         const value = match[2]

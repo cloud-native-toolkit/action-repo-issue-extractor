@@ -302,17 +302,19 @@ const extractValuesFromLabel = (labels) => {
 };
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const extractValuesFromComments = (comments) => {
+    const logger = typescript_ioc_1.Container.get(logger_1.LoggerApi);
     const valueRegEx = new RegExp('^/([^ ]+) (.*)', 'ig');
     const commentLines = comments.reduce((result, current) => {
         if (current.body) {
+            logger.info(`Comment body: ${current.body}`);
             result.push(...current.body.split(/\r?\n/).filter(l => valueRegEx.test(l)));
         }
         return result;
     }, []);
-    const logger = typescript_ioc_1.Container.get(logger_1.LoggerApi);
     logger.info(`Extracted comment lines: ${JSON.stringify(commentLines)}`);
     return commentLines.reduce((result, current) => {
         const match = current.match(valueRegEx);
+        logger.info(`Match: ${JSON.stringify(match)}`);
         if (match) {
             const key = match[1];
             const value = match[2];
