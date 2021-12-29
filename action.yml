@@ -21,6 +21,8 @@ outputs:
     description: The name of the repository
   provider:
     description: The cloud provider
+  softwareProvider:
+    description: The software provider
   catagory:
     description: The category of the module
   approved:

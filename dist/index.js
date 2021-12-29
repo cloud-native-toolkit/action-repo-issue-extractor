@@ -115,20 +115,21 @@ class IssueExtractor {
                 issue_number
             })
                 .then(response => response.data);
-            const type = extractType(labels);
-            const provider = extractProvider(labels);
-            const category = extractCategory(labels);
-            const approved = isApproved(labels);
-            return {
+            const labelValues = extractValuesFromLabel(labels);
+            const comments = yield octokit
+                .request('GET /repos/{owner}/{repo}/issues/{issue_number}/comments', {
+                owner,
+                repo,
+                issue_number
+            })
+                .then(response => response.data);
+            const commentValues = extractValuesFromComments(comments);
+            return Object.assign({
                 name,
-                type,
-                provider,
-                category,
-                approved,
                 requester,
                 state,
                 issue_number
-            };
+            }, labelValues, commentValues);
         });
     }
 }
@@ -145,33 +146,48 @@ const extractRequester = (issue) => {
 const extractState = (issue) => {
     return issue.state;
 };
-const extractType = (labels) => {
-    return extractValueFromLabel(labels, 'type');
-};
-const extractProvider = (labels) => {
-    return extractValueFromLabel(labels, 'platform');
-};
-const extractCategory = (labels) => {
-    return extractValueFromLabel(labels, 'category');
-};
-const isApproved = (labels) => {
-    return hasLabel(labels, 'approved');
-};
-const extractValueFromLabel = (labels, key) => {
-    const result = labels
-        .map(label => label.name)
-        .filter((name) => name.startsWith(`${key}:`))
-        .map(name => name.split(':')[1].trim());
-    if (result.length === 0) {
-        return;
-    }
-    return result[0];
-};
-const hasLabel = (labels, label) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const extractValuesFromLabel = (labels) => {
     const result = labels
         .map(l => l.name)
-        .filter(name => name === label);
-    return result.length > 0;
+        .reduce((total, current) => {
+        if (current.includes(':')) {
+            const key = current.split(':')[0];
+            const value = current.split(':')[1];
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            total[key] = value;
+        }
+        else {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            total[current] = true;
+        }
+        return total;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    }, {});
+    return result;
+};
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const extractValuesFromComments = (comments) => {
+    const valueRegEx = new RegExp('^/([^ ]+) (.*)', 'ig');
+    const commentLines = comments.reduce((result, current) => {
+        if (current.body) {
+            result.push(...current.body.split(/\r?\n/).filter(l => valueRegEx.test(l)));
+        }
+        return result;
+    }, []);
+    return commentLines.reduce((result, current) => {
+        const match = current.match(valueRegEx);
+        if (match) {
+            const key = match[1];
+            const value = match[2];
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            result[key] = value;
+        }
+        return result;
+    }, 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    {});
 };
 
 

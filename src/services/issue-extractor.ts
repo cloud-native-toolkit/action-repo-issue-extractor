@@ -26,6 +26,9 @@ interface GithubIssue {
 interface GithubLabel {
   name: string
 }
+interface GithubComment {
+  body?: string
+}
 
 export class IssueExtractor {
   async extractInfo({
@@ -55,22 +58,28 @@ export class IssueExtractor {
       })
       .then(response => response.data)
 
-    const type = extractType(labels)
-    const provider = extractProvider(labels)
-    const category = extractCategory(labels)
+    const labelValues = extractValuesFromLabel(labels)
 
-    const approved = isApproved(labels)
+    const comments: GithubComment[] = await octokit
+      .request('GET /repos/{owner}/{repo}/issues/{issue_number}/comments', {
+        owner,
+        repo,
+        issue_number
+      })
+      .then(response => response.data)
 
-    return {
-      name,
-      type,
-      provider,
-      category,
-      approved,
-      requester,
-      state,
-      issue_number
-    }
+    const commentValues = extractValuesFromComments(comments)
+
+    return Object.assign(
+      {
+        name,
+        requester,
+        state,
+        issue_number
+      },
+      labelValues,
+      commentValues
+    )
   }
 }
 
@@ -90,42 +99,62 @@ const extractState = (issue: GithubIssue): string => {
   return issue.state
 }
 
-const extractType = (labels: GithubLabel[]): string | undefined => {
-  return extractValueFromLabel(labels, 'type')
-}
-
-const extractProvider = (labels: GithubLabel[]): string | undefined => {
-  return extractValueFromLabel(labels, 'platform')
-}
-
-const extractCategory = (labels: GithubLabel[]): string | undefined => {
-  return extractValueFromLabel(labels, 'category')
-}
-
-const isApproved = (labels: GithubLabel[]): boolean => {
-  return hasLabel(labels, 'approved')
-}
-
-const extractValueFromLabel = (
-  labels: GithubLabel[],
-  key: string
-): string | undefined => {
-  const result: string[] = labels
-    .map(label => label.name)
-    .filter((name: string) => name.startsWith(`${key}:`))
-    .map(name => name.split(':')[1].trim())
-
-  if (result.length === 0) {
-    return
-  }
-
-  return result[0]
-}
-
-const hasLabel = (labels: GithubLabel[], label: string): boolean => {
-  const result: string[] = labels
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const extractValuesFromLabel = <T = any>(labels: GithubLabel[]): T => {
+  const result: T = labels
     .map(l => l.name)
-    .filter(name => name === label)
+    .reduce((total: T, current: string) => {
+      if (current.includes(':')) {
+        const key: keyof T = current.split(':')[0] as keyof T
+        const value = current.split(':')[1]
 
-  return result.length > 0
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        total[key] = value as any
+      } else {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        total[current as keyof T] = true as any
+      }
+
+      return total
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    }, {} as any)
+
+  return result
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const extractValuesFromComments = <T = any>(comments: GithubComment[]): T => {
+  const valueRegEx = new RegExp('^/([^ ]+) (.*)', 'ig')
+
+  const commentLines: string[] = comments.reduce(
+    (result: string[], current: GithubComment) => {
+      if (current.body) {
+        result.push(
+          ...current.body.split(/\r?\n/).filter(l => valueRegEx.test(l))
+        )
+      }
+
+      return result
+    },
+    []
+  )
+
+  return commentLines.reduce(
+    (result: T, current: string) => {
+      const match: string[] | null = current.match(valueRegEx)
+
+      if (match) {
+        const key = match[1]
+        const value = match[2]
+
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        result[key] = value
+      }
+
+      return result
+    },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    {} as any
+  )
 }
