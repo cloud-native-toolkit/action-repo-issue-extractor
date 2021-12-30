@@ -144,16 +144,9 @@ const extractValuesFromComments = <T = any>(comments: GithubComment[]): T => {
   const logger: LoggerApi = Container.get(LoggerApi)
   const valueRegEx = new RegExp('^/([^ ]+) (.*)', 'ig')
 
-  const commentLines: string[] = comments.reduce(
-    (result: string[], current: GithubComment) => {
-      if (current.body && valueRegEx.test(current.body)) {
-        result.push(current.body)
-      }
-
-      return result
-    },
-    []
-  )
+  const commentLines: string[] = comments
+    .map(comment => comment.body || '')
+    .filter(comment => valueRegEx.test(comment))
   logger.info(`Extracted comment lines: ${JSON.stringify(commentLines)}`)
 
   return commentLines.reduce(

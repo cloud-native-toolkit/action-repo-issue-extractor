@@ -304,12 +304,9 @@ const extractValuesFromLabel = (labels) => {
 const extractValuesFromComments = (comments) => {
     const logger = typescript_ioc_1.Container.get(logger_1.LoggerApi);
     const valueRegEx = new RegExp('^/([^ ]+) (.*)', 'ig');
-    const commentLines = comments.reduce((result, current) => {
-        if (current.body && valueRegEx.test(current.body)) {
-            result.push(current.body);
-        }
-        return result;
-    }, []);
+    const commentLines = comments
+        .map(comment => comment.body || '')
+        .filter(comment => valueRegEx.test(comment));
     logger.info(`Extracted comment lines: ${JSON.stringify(commentLines)}`);
     return commentLines.reduce((result, current) => {
         const match = current.match(valueRegEx);
