@@ -146,7 +146,7 @@ const extractValuesFromComments = <T = any>(comments: GithubComment[]): T => {
   const commentLines: string[] = comments
     .map(comment => comment.body || '')
     .filter(comment => /^\/.*/.test(comment))
-  logger.info(`Extracted comment lines: ${JSON.stringify(commentLines)}`)
+  logger.debug(`Extracted comment lines: ${JSON.stringify(commentLines)}`)
 
   return commentLines.reduce(
     (result: T, current: string) => {

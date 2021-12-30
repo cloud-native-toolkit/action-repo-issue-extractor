@@ -306,7 +306,7 @@ const extractValuesFromComments = (comments) => {
     const commentLines = comments
         .map(comment => comment.body || '')
         .filter(comment => /^\/.*/.test(comment));
-    logger.info(`Extracted comment lines: ${JSON.stringify(commentLines)}`);
+    logger.debug(`Extracted comment lines: ${JSON.stringify(commentLines)}`);
     return commentLines.reduce((result, current) => {
         const match = current.match(/^\/([^ ]+) (.*)/);
         logger.debug(`Match: ${JSON.stringify(match)}`);
