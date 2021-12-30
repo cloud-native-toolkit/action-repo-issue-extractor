@@ -303,13 +303,12 @@ const extractValuesFromLabel = (labels) => {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const extractValuesFromComments = (comments) => {
     const logger = typescript_ioc_1.Container.get(logger_1.LoggerApi);
-    const valueRegEx = new RegExp('^/([^ ]+) (.*)', 'ig');
     const commentLines = comments
         .map(comment => comment.body || '')
-        .filter(comment => valueRegEx.test(comment));
+        .filter(comment => /^\/.*/.test(comment));
     logger.info(`Extracted comment lines: ${JSON.stringify(commentLines)}`);
     return commentLines.reduce((result, current) => {
-        const match = current.match(valueRegEx);
+        const match = current.match(/^\/([^ ]+) (.*)/);
         logger.info(`Match: ${JSON.stringify(match)}`);
         if (match) {
             const key = match[1];
