@@ -152,7 +152,7 @@ const extractValuesFromComments = <T = any>(comments: GithubComment[]): T => {
     (result: T, current: string) => {
       const match: string[] | null = current.match(/^\/([^ ]+) (.*)/)
 
-      logger.info(`Match: ${JSON.stringify(match)}`)
+      logger.debug(`Match: ${JSON.stringify(match)}`)
       if (match) {
         const key = match[1]
         const value = match[2]

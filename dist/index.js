@@ -309,7 +309,7 @@ const extractValuesFromComments = (comments) => {
     logger.info(`Extracted comment lines: ${JSON.stringify(commentLines)}`);
     return commentLines.reduce((result, current) => {
         const match = current.match(/^\/([^ ]+) (.*)/);
-        logger.info(`Match: ${JSON.stringify(match)}`);
+        logger.debug(`Match: ${JSON.stringify(match)}`);
         if (match) {
             const key = match[1];
             const value = match[2];
