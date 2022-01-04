@@ -35,6 +35,8 @@ outputs:
     description: The state of the issue
   issue_number:
     description: The issue from which the information was extracted
+  new_module:
+    description: Flag indicating the issue is a new_module request
 runs:
   using: 'node12'
   main: 'dist/index.js'
