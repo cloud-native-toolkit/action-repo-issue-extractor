@@ -56,7 +56,7 @@ export class IssueExtractor {
       .then(response => response.data)) as any
 
     const displayName = extractName(issue)
-    const name = displayName.toLowerCase().replace(/\w/g, '-')
+    const name = displayName.toLowerCase().replace(/\s/g, '-')
     const requester = extractRequester(issue)
     const state = extractState(issue)
 
