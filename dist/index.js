@@ -233,7 +233,8 @@ class IssueExtractor {
             })
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 .then(response => response.data));
-            const name = extractName(issue);
+            const displayName = extractName(issue);
+            const name = displayName.toLowerCase().replace(/\w/g, "-");
             const requester = extractRequester(issue);
             const state = extractState(issue);
             this.logger.info(`Retrieving labels for issue: ${issue_number}`);
@@ -258,12 +259,17 @@ class IssueExtractor {
             this.logger.debug(`  Comments: ${JSON.stringify(comments)}`);
             const commentValues = extractValuesFromComments(comments);
             this.logger.info(`Extracted comment values: ${JSON.stringify(commentValues)}`);
-            return Object.assign({
+            const result = Object.assign({
                 name,
+                displayName,
                 requester,
                 state,
                 issue_number
             }, labelValues, commentValues);
+            if (!/^[a-z0-9-]+$/g.test(result.name)) {
+                throw new Error(`Invalid repo name: ${result.name}`);
+            }
+            return result;
         });
     }
 }
