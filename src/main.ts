@@ -42,7 +42,9 @@ async function run(): Promise<void> {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const key: keyof IssueInfo = value as any
 
-      core.setOutput(key, result[key] || '')
+      if (key != "displayName" || (result[key] === defined || result[key] === "")) {
+        core.setOutput(key, result[key] || '')
+      }
     })
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
