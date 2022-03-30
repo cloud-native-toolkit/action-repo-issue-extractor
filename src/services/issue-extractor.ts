@@ -73,7 +73,7 @@ export class IssueExtractor {
     if (
       labels.filter(label => {
         this.logger.info(label.name)
-        return (label.name == 'repo_created')
+        return label.name === 'repo_created'
       }).length > 0
     ) {
       throw new Error(`Aborting: repo already created`)

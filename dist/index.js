@@ -245,9 +245,10 @@ class IssueExtractor {
                 issue_number
             })
                 .then(response => response.data);
-            this.logger.debug(`  Labels: ${JSON.stringify(labels)}`);
+            this.logger.info(`  Labels: ${JSON.stringify(labels)}`);
             if (labels.filter(label => {
-                return label.name = 'repo_created';
+                this.logger.info(label.name);
+                return (label.name === 'repo_created');
             }).length > 0) {
                 throw new Error(`Aborting: repo already created`);
             }
