@@ -70,10 +70,12 @@ export class IssueExtractor {
       .then(response => response.data)
     this.logger.debug(`  Labels: ${JSON.stringify(labels)}`)
 
-    if (labels.filter(label => {
-        return label.name = 'repo_created'
-    }).length > 0)  {
-        throw new Error(`Aborting: repo already created`)
+    if (
+      labels.filter(label => {
+        return (label.name = 'repo_created')
+      }).length > 0
+    ) {
+      throw new Error(`Aborting: repo already created`)
     }
 
     const labelValues = extractValuesFromLabel(labels)
