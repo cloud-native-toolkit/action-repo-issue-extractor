@@ -72,6 +72,7 @@ export class IssueExtractor {
 
     if (
       labels.filter(label => {
+        console.log(label.name)
         return (label.name == 'repo_created')
       }).length > 0
     ) {
