@@ -22,6 +22,6 @@ jobs:
       - uses: ./
         with:
           token: ${{ secrets.GIT_ADMIN_TOKEN }}
-          issue_number: 2
+          issue_number: 75
           repo: software-everywhere
 
