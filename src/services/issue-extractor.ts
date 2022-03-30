@@ -68,7 +68,7 @@ export class IssueExtractor {
         issue_number
       })
       .then(response => response.data)
-    this.logger.debug(`  Labels: ${JSON.stringify(labels)}`)
+    this.logger.info(`  Labels: ${JSON.stringify(labels)}`)
 
     if (
       labels.filter(label => {
