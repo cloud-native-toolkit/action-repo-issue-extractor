@@ -55,6 +55,10 @@ export class IssueExtractor {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .then(response => response.data)) as any
 
+    if (!issue.title.startsWith('Request new module: ')) {
+      throw new Error(`Aborting: not a new module request.`)
+    }
+
     const displayName = extractName(issue)
     const name = displayName.toLowerCase().replace(/\s/g, '-')
     const requester = extractRequester(issue)
