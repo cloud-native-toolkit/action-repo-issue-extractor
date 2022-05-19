@@ -55,15 +55,6 @@ export class IssueExtractor {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .then(response => response.data)) as any
 
-    if (!issue.title.startsWith('Request new module: ')) {
-      throw new Error(`Aborting: not a new module request.`)
-    }
-
-    const displayName = extractName(issue)
-    const name = displayName.toLowerCase().replace(/\s/g, '-')
-    const requester = extractRequester(issue)
-    const state = extractState(issue)
-
     this.logger.info(`Retrieving labels for issue: ${issue_number}`)
     const labels: GithubLabel[] = await octokit
       .request('GET /repos/{owner}/{repo}/issues/{issue_number}/labels', {
@@ -74,11 +65,16 @@ export class IssueExtractor {
       .then(response => response.data)
     this.logger.debug(`  Labels: ${JSON.stringify(labels)}`)
 
-    if (
-      labels.filter(label => {
-        return label.name === 'repo_created'
-      }).length > 0
-    ) {
+    if (!labels.map(label => label.name).includes('new_module')) {
+      throw new Error(`Aborting: not a new module request.`)
+    }
+
+    const displayName = extractName(issue)
+    const name = displayName.toLowerCase().replace(/\s/g, '-')
+    const requester = extractRequester(issue)
+    const state = extractState(issue)
+
+    if (labels.map(label => label.name).includes('repo_created')) {
       throw new Error(`Aborting: repo already created`)
     }
 
@@ -121,6 +117,10 @@ export class IssueExtractor {
 }
 
 const extractName = (issue: GithubIssue): string => {
+  if (!issue.title.startsWith('Request new module: ')) {
+    return ''
+  }
+
   if (issue.title.split(':').length > 1) {
     return issue.title.split(':')[1].trim()
   }
